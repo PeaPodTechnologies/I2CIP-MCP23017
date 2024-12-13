@@ -111,6 +111,7 @@ i2cip_errorlevel_t MCP23017::get(i2cip_mcp23017_t& dest, const i2cip_mcp23017_bi
     DEBUG_DELAY();
     I2CIP_DEBUG_SERIAL.print(F("MCP23017 GET: MASK 0b"));
     I2CIP_DEBUG_SERIAL.print((uint8_t)(args >> 8), BIN);
+    I2CIP_DEBUG_SERIAL.print(' ');
     I2CIP_DEBUG_SERIAL.print((uint8_t)args, BIN);
     I2CIP_DEBUG_SERIAL.print(F(" -> ["));
     uint8_t bits = sizeof(i2cip_mcp23017_bitmask_t) * 8;
@@ -185,6 +186,7 @@ i2cip_errorlevel_t MCP23017::getIODIR(i2cip_mcp23017_t& dest) {
     DEBUG_DELAY();
     I2CIP_DEBUG_SERIAL.print(F("MCP23017 IODIR 0b"));
     I2CIP_DEBUG_SERIAL.print((uint8_t)(dest >> 8), BIN);
+    I2CIP_DEBUG_SERIAL.print(' ');
     I2CIP_DEBUG_SERIAL.print((uint8_t)dest, BIN);
     I2CIP_DEBUG_SERIAL.println();
     DEBUG_DELAY();
@@ -208,6 +210,7 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
     DEBUG_DELAY();
     I2CIP_DEBUG_SERIAL.print(F("MCP23017 SET: MASK 0b"));
     I2CIP_DEBUG_SERIAL.print((uint8_t)(args >> 8), BIN);
+    I2CIP_DEBUG_SERIAL.print(' ');
     I2CIP_DEBUG_SERIAL.print((uint8_t)args, BIN);
     I2CIP_DEBUG_SERIAL.print(F(" -> {"));
     uint8_t bits = sizeof(i2cip_mcp23017_bitmask_t) * 8;

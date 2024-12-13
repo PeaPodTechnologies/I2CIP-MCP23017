@@ -39,7 +39,7 @@ typedef uint16_t i2cip_mcp23017_t;
 typedef uint16_t i2cip_mcp23017_bitmask_t;
 
 class MCP23017_Pin; class MCP23017;
-typedef enum { PIN_OFF = LOW, PIN_ON = HIGH, PIN_UNDEF } i2cip_mcp23017_pin_t;
+
 typedef enum { PIN_A0 = 0, PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6, PIN_A7, PIN_B0, PIN_B1, PIN_B2, PIN_B3, BPIN_4, PIN_B5, PIN_B6, PIN_B7 } i2cip_mcp23017_pinsel_t;
 typedef MCP23017_Pin* (*i2cip_mcp23017_pinFactory)(MCP23017* that, i2cip_mcp23017_pinsel_t pin);
 
@@ -106,16 +106,16 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
 
 // Easily edit and read one pin at a time
 
-class MCP23017_Pin : public IOInterface<i2cip_mcp23017_pin_t, i2cip_mcp23017_pinsel_t, i2cip_mcp23017_pin_t, i2cip_mcp23017_pinsel_t> {
+class MCP23017_Pin : public IOInterface<i2cip_state_pin_t, i2cip_mcp23017_pinsel_t, i2cip_state_pin_t, i2cip_mcp23017_pinsel_t> {
   private:
     MCP23017* const mcp;
     const i2cip_mcp23017_pinsel_t pin;
   public:
-    MCP23017_Pin(MCP23017* that, i2cip_mcp23017_pinsel_t pin) : IOInterface<i2cip_mcp23017_pin_t, i2cip_mcp23017_pinsel_t, i2cip_mcp23017_pin_t, i2cip_mcp23017_pinsel_t>(nullptr), pin(pin), mcp(that) { }
+    MCP23017_Pin(MCP23017* that, i2cip_mcp23017_pinsel_t pin) : IOInterface<i2cip_state_pin_t, i2cip_mcp23017_pinsel_t, i2cip_state_pin_t, i2cip_mcp23017_pinsel_t>(nullptr), pin(pin), mcp(that) { }
 
     static MCP23017_Pin* mcpPinFactory(MCP23017* that, i2cip_mcp23017_pinsel_t pin) { return new MCP23017_Pin(that, pin); }
 
-    i2cip_errorlevel_t get(i2cip_mcp23017_pin_t& dest, const i2cip_mcp23017_pinsel_t& args) override {
+    i2cip_errorlevel_t get(i2cip_state_pin_t& dest, const i2cip_mcp23017_pinsel_t& args) override {
       i2cip_mcp23017_bitmask_t a = (mcp->getArgsA() & ~(1 << args)) | (1 << args);
       i2cip_errorlevel_t errlev = ((Device*)mcp)->get(&a);
       I2CIP_ERR_BREAK(errlev);
@@ -123,7 +123,7 @@ class MCP23017_Pin : public IOInterface<i2cip_mcp23017_pin_t, i2cip_mcp23017_pin
       dest = (cache & a) ? PIN_ON : PIN_OFF;
       return errlev;
     }
-    i2cip_errorlevel_t set(const i2cip_mcp23017_pin_t& value, const i2cip_mcp23017_pinsel_t& args) override {
+    i2cip_errorlevel_t set(const i2cip_state_pin_t& value, const i2cip_mcp23017_pinsel_t& args) override {
       i2cip_mcp23017_bitmask_t s = (mcp->getValue() & ~(1 << args)) | (value ? (1 << args) : 0);
       i2cip_mcp23017_bitmask_t b = (mcp->getArgsB() & ~(1 << args)); // Set bit output (0)
       i2cip_errorlevel_t errlev = ((Device*)mcp)->set(&s, &b);
