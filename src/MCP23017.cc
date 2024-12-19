@@ -4,87 +4,12 @@
 #include <device.h>
 #include <debug.h>
 
-#ifndef mcp23017_member_guard
-bool MCP23017::_id_set = false;
-char MCP23017::_id[I2CIP_ID_SIZE] = { '\0' };
-#define mcp23017_member_guard
-#endif
-
 using namespace I2CIP;
 
-void MCP23017::loadID() {
-  uint8_t idlen = strlen_P(i2cip_mcp23017_id_progmem);
+I2CIP_DEVICE_INIT_STATIC_ID(MCP23017)
+// I2CIP_DEVICES_INIT_PROGMEM_ID(MCP23017)
 
-  // #ifdef I2CIP_DEBUG_SERIAL
-  //   DEBUG_DELAY();
-  //   I2CIP_DEBUG_SERIAL.print(F("Loading MCP23017 ID PROGMEM to Static Array @0x"));
-  //   I2CIP_DEBUG_SERIAL.print((uintptr_t)(MCP23017::_id), HEX);
-  //   I2CIP_DEBUG_SERIAL.print(F(" ("));
-  //   I2CIP_DEBUG_SERIAL.print(idlen+1);
-  //   I2CIP_DEBUG_SERIAL.print(F(" bytes) '"));
-  // #endif
-
-  // Read in PROGMEM
-  for (uint8_t k = 0; k < idlen; k++) {
-    char c = pgm_read_byte_near(i2cip_mcp23017_id_progmem + k);
-    // #ifdef I2CIP_DEBUG_SERIAL
-    //   DEBUG_SERIAL.print(c);
-    // #endif
-    MCP23017::_id[k] = c;
-  }
-
-  // #ifdef I2CIP_DEBUG_SERIAL
-  //   DEBUG_SERIAL.print(F("'\n"));
-  //   DEBUG_DELAY();
-  // #endif
-
-  #ifdef I2CIP_DEBUG_SERIAL
-    DEBUG_DELAY();
-    I2CIP_DEBUG_SERIAL.print(F("MCP23017 ID Loaded: '"));
-    I2CIP_DEBUG_SERIAL.print(MCP23017::_id);
-    I2CIP_DEBUG_SERIAL.print(F("' @"));
-    I2CIP_DEBUG_SERIAL.println((uintptr_t)(&MCP23017::_id[0]), HEX);
-    DEBUG_DELAY();
-  #endif
-
-  MCP23017::_id[idlen] = '\0';
-  MCP23017::_id_set = true;
-}
-
-// Handles ID pointer assignment too
-// NEVER returns nullptr, unless out of memory
-Device* MCP23017::mcp23017Factory(const i2cip_fqa_t& fqa, const i2cip_id_t& id) {
-  if(MCP23017::_id_set != true || id == nullptr) {
-    loadID();
-
-    return (Device*)(new MCP23017(fqa, (id == nullptr ? _id : id)));
-  }
-
-  return (Device*)(new MCP23017(fqa, id));
-}
-
-Device* MCP23017::mcp23017Factory(const i2cip_fqa_t& fqa) { return mcp23017Factory(fqa, MCP23017::_id); }
-
-MCP23017::MCP23017(const i2cip_fqa_t& fqa) : MCP23017(fqa, _id) { loadID(); }
-MCP23017::MCP23017(const i2cip_fqa_t& fqa, const i2cip_id_t& id) : Device(fqa, id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this), pinFactory(&MCP23017_Pin::mcpPinFactory) {
-  #ifdef I2CIP_DEBUG_SERIAL
-    DEBUG_DELAY();
-    I2CIP_DEBUG_SERIAL.print(F("MCP23017 Constructed (ID '"));
-    I2CIP_DEBUG_SERIAL.print(this->id);
-    I2CIP_DEBUG_SERIAL.print(F("' @0x"));
-    I2CIP_DEBUG_SERIAL.print((uintptr_t)&(this->id[0]), HEX);
-    I2CIP_DEBUG_SERIAL.print(F("; FQA "));
-    I2CIP_DEBUG_SERIAL.print(I2CIP_FQA_SEG_I2CBUS(fqa), HEX);
-    I2CIP_DEBUG_SERIAL.print(F(":"));
-    I2CIP_DEBUG_SERIAL.print(I2CIP_FQA_SEG_MODULE(fqa), HEX);
-    I2CIP_DEBUG_SERIAL.print(F(":"));
-    I2CIP_DEBUG_SERIAL.print(I2CIP_FQA_SEG_MUXBUS(fqa), HEX);
-    I2CIP_DEBUG_SERIAL.print(F(":"));
-    I2CIP_DEBUG_SERIAL.print(I2CIP_FQA_SEG_DEVADR(fqa), HEX);
-    I2CIP_DEBUG_SERIAL.print(F(")\n"));
-    DEBUG_DELAY();
-  #endif
-}
+MCP23017::MCP23017(i2cip_fqa_t fqa, const i2cip_id_t& id) : Device(fqa, id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }
 
 MCP23017::~MCP23017() {
   #ifdef I2CIP_DEBUG_SERIAL
@@ -103,7 +28,11 @@ MCP23017::~MCP23017() {
   #endif
 
   // Cleanup
-  // if(this->getValue() != nullptr && this->getValue() != _failsafe) delete this->getValue();
+  // for(uint8_t i = 0; i < 16; i++) {
+  //   if(pins[i] != nullptr) {
+  //     delete pins[i];
+  //   }
+  // }
 }
 
 i2cip_errorlevel_t MCP23017::get(i2cip_mcp23017_t& dest, const i2cip_mcp23017_bitmask_t& args) {
@@ -302,3 +231,18 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
 
 // dir_bit.write((mode == OUTPUT) ? 0 : 1);
 // pullup_bit.write((mode == INPUT_PULLUP) ? 1 : 0);
+
+// i2cip_errorlevel_t MCP23017_Pin::get(i2cip_state_pin_t& dest, const i2cip_mcp23017_pinsel_t& args) {
+//   i2cip_mcp23017_bitmask_t a = (mcp->getArgsA() & ~(1 << args)) | (1 << args);
+//   i2cip_errorlevel_t errlev = ((Device*)mcp)->get(&a);
+//   I2CIP_ERR_BREAK(errlev);
+//   i2cip_mcp23017_t cache = mcp->getCache();
+//   dest = (cache & a) ? PIN_ON : PIN_OFF;
+//   return errlev;
+// }
+// i2cip_errorlevel_t MCP23017_Pin::set(const i2cip_state_pin_t& value, const i2cip_mcp23017_pinsel_t& args) {
+//   i2cip_mcp23017_bitmask_t s = (mcp->getValue() & ~(1 << args)) | (value ? (1 << args) : 0);
+//   i2cip_mcp23017_bitmask_t b = (mcp->getArgsB() & ~(1 << args)); // Set bit output (0)
+//   i2cip_errorlevel_t errlev = ((Device*)mcp)->set(&s, &b);
+//   return errlev;
+// }
