@@ -6,8 +6,10 @@
 
 using namespace I2CIP;
 
-I2CIP_DEVICE_INIT_STATIC_ID(MCP23017)
-// I2CIP_DEVICES_INIT_PROGMEM_ID(MCP23017)
+I2CIP_DEVICE_INIT_STATIC_ID(MCP23017);
+// By default, ALL input, no/low output
+I2CIP_INPUT_INIT_RESET(MCP23017, i2cip_mcp23017_t, 0x0000, i2cip_mcp23017_bitmask_t, 0xFFFF);
+I2CIP_OUTPUT_INIT_FAILSAFE(MCP23017, i2cip_mcp23017_t, 0x0000, i2cip_mcp23017_bitmask_t, 0x0000);
 
 MCP23017::MCP23017(i2cip_fqa_t fqa, const i2cip_id_t& id) : Device(fqa, id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }
 

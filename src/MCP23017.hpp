@@ -75,7 +75,9 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
   #endif
   {
   I2CIP_DEVICE_CLASS_BUNDLE(MCP23017);
+  I2CIP_OUTPUT_USE_FAILSAFE(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t);
 
+  I2CIP_INPUT_USE_RESET(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t)
   I2CIP_INPUT_USE_TOSTRING(i2cip_mcp23017_t, "%u"); // JSON-friendly
   I2CIP_INPUT_ADD_PRINTCACHE(i2cip_mcp23017_t, "%04X"); // HEX
 
@@ -85,9 +87,6 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
 
   private:
     // MCP23017(i2cip_fqa_t fqa) : Device(fqa, i2cip_mcp23017_id_progmem, _id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }
-
-    const i2cip_mcp23017_bitmask_t _failsafe_args = 0x0; // NONE SELECTED
-    const i2cip_mcp23017_t _failsafe = 0x0; // ALL OFF
 
     uint16_t readBuffer = 0x00;
 
@@ -121,11 +120,6 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
      * @param args Number of bytes to write
      **/
     i2cip_errorlevel_t set(const i2cip_mcp23017_t& value, const i2cip_mcp23017_bitmask_t& args) override;
-
-    void clearCache(void) override { setCache(0x0); }
-    void resetFailsafe(void) override { setValue(_failsafe); }
-    const i2cip_mcp23017_bitmask_t& getDefaultA(void) const override { return _failsafe_args; };
-    const i2cip_mcp23017_bitmask_t& getDefaultB(void) const override { return _failsafe_args; };
 
     // MCP23017_Pin* operator[](i2cip_mcp23017_pinsel_t pin) { if (pins[pin] == nullptr) { pins[pin] = MCP23017_Pin::factory(this, pin); } return pins[pin]; }
 
