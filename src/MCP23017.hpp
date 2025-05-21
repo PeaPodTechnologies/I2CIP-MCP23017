@@ -27,10 +27,6 @@
 // #define I2CIP_MCP23017_USEPULLUPS true // Uncomment to enable pullups
 
 class MCP23017;
-#ifdef I2CIP_USE_GUARANTEES
-#define I2CIP_GUARANTEE_MCP23017 23017
-I2CIP_GUARANTEE_DEFINE(MCP23017, I2CIP_GUARANTEE_MCP23017);
-#endif
 
 // Future-Proofing ;)
 // namespace ControlSystemsOS {
@@ -69,21 +65,13 @@ typedef enum { PIN_A0 = 0, PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6, PIN_A
 //     const i2cip_mcp23017_pinsel_t& getDefaultB(void) const override { return pin; }
 // };
 
-class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>
-  #ifdef I2CIP_USE_GUARANTEES
-  , public Guarantee<MCP23017>
-  #endif
-  {
+class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t> {
   I2CIP_DEVICE_CLASS_BUNDLE(MCP23017);
   I2CIP_OUTPUT_USE_FAILSAFE(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t);
 
   I2CIP_INPUT_USE_RESET(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t)
   I2CIP_INPUT_USE_TOSTRING(i2cip_mcp23017_t, "%u"); // JSON-friendly
   I2CIP_INPUT_ADD_PRINTCACHE(i2cip_mcp23017_t, "%04X"); // HEX
-
-  #ifdef I2CIP_USE_GUARANTEES
-  I2CIP_CLASS_USE_GUARANTEE(MCP23017, I2CIP_GUARANTEE_MCP23017);
-  #endif
 
   private:
     // MCP23017(i2cip_fqa_t fqa) : Device(fqa, i2cip_mcp23017_id_progmem, _id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }
