@@ -69,11 +69,11 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
   I2CIP_DEVICE_CLASS_BUNDLE(MCP23017);
 
   I2CIP_OUTPUT_USE_FAILSAFE(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t);
-  I2CIP_OUTPUT_USE_TOSTRING(i2cip_mcp23017_t, "%04X");
+  I2CIP_OUTPUT_USE_TOSTRING(i2cip_mcp23017_t, "0x%04X");
 
   I2CIP_INPUT_USE_RESET(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t)
   I2CIP_INPUT_USE_TOSTRING(i2cip_mcp23017_t, "%u"); // JSON-friendly
-  I2CIP_INPUT_ADD_PRINTCACHE(i2cip_mcp23017_t, "%04X"); // HEX
+  I2CIP_INPUT_ADD_PRINTCACHE(i2cip_mcp23017_t, "0x%04X"); // HEX
 
 
   private:
