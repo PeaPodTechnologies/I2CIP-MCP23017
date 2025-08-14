@@ -19,7 +19,7 @@
 #define MCP23XXX_OLAT     (uint8_t)0x0A   //!< Output latch register
 
 // #define I2CIP_MCP23017_SIZE     100   // MCP23017 size in bytes
-#define I2CIP_MCP23017_ADDRESS     0x20    // MCP23017 address (0x20-0x27)
+#define I2CIP_MCP23017_ADDRESS     32    // MCP23017 address (0x20-0x27)
 #define I2CIP_MCP23017_BANKJUMP     (uint8_t)0xA
 // #define I2CIP_MCP23017_TIMEOUT  1000   // If we're going to crash on a module ping fail, we should wait a bit
 
@@ -67,11 +67,14 @@ typedef enum { PIN_A0 = 0, PIN_A1, PIN_A2, PIN_A3, PIN_A4, PIN_A5, PIN_A6, PIN_A
 
 class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t> {
   I2CIP_DEVICE_CLASS_BUNDLE(MCP23017);
+
   I2CIP_OUTPUT_USE_FAILSAFE(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t);
+  I2CIP_OUTPUT_USE_TOSTRING(i2cip_mcp23017_t, "%04X");
 
   I2CIP_INPUT_USE_RESET(i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t)
   I2CIP_INPUT_USE_TOSTRING(i2cip_mcp23017_t, "%u"); // JSON-friendly
   I2CIP_INPUT_ADD_PRINTCACHE(i2cip_mcp23017_t, "%04X"); // HEX
+
 
   private:
     // MCP23017(i2cip_fqa_t fqa) : Device(fqa, i2cip_mcp23017_id_progmem, _id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }

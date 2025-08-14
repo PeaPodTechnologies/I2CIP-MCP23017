@@ -1,8 +1,8 @@
 #include <MCP23017.h>
 
-#include <fqa.h>
-#include <device.h>
-#include <debug.h>
+#ifndef I2CIP_H_
+#error "I2CIP must be in I2CIP-JHD1313/libs, or, adjacent to I2CIP-JHD1313 together in $PWD/libs"
+#else
 
 using namespace I2CIP;
 
@@ -10,6 +10,31 @@ I2CIP_DEVICE_INIT_STATIC_ID(MCP23017);
 // By default, ALL input, no/low output
 I2CIP_INPUT_INIT_RESET(MCP23017, i2cip_mcp23017_t, 0x0000, i2cip_mcp23017_bitmask_t, 0xFFFF);
 I2CIP_OUTPUT_INIT_FAILSAFE(MCP23017, i2cip_mcp23017_t, 0x0000, i2cip_mcp23017_bitmask_t, 0x0000);
+
+void MCP23017::parseJSONArgs(I2CIP::i2cip_args_io_t& argsDest, JsonVariant argsA, JsonVariant argsS, JsonVariant argsB) {
+  if(argsA.is<int>()) {
+    int in = argsA.as<int>();
+    if(in >= 0 && in <= 0xFFFF) { // TODO: Fix upper bounds
+      // Set input
+      argsDest.a = new int(in);
+    }
+  }
+  if(argsS.is<int>() && argsB.is<int>()) {
+    int out = argsS.as<int>();
+    int outmask = argsB.as<int>();
+    if(out >= 0 && out <= 0xFFFF && outmask >= 0 && outmask <= 0xFFFF) { // TODO: Fix upper bounds
+      // Set output
+      argsDest.s = new int(out);
+      argsDest.b = new int(outmask);
+    }
+  }
+}
+
+void MCP23017::deleteArgs(I2CIP::i2cip_args_io_t& args) {
+  delete((i2cip_mcp23017_bitmask_t*)args.a);
+  delete((i2cip_mcp23017_t*)args.s);
+  delete((i2cip_mcp23017_bitmask_t*)args.b);
+}
 
 MCP23017::MCP23017(i2cip_fqa_t fqa, const i2cip_id_t& id) : Device(fqa, id), IOInterface<i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t, i2cip_mcp23017_t, i2cip_mcp23017_bitmask_t>((Device*)this) { }
 
@@ -248,3 +273,5 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
 //   i2cip_errorlevel_t errlev = ((Device*)mcp)->set(&s, &b);
 //   return errlev;
 // }
+
+#endif
