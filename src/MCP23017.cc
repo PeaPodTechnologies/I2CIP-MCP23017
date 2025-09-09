@@ -179,8 +179,8 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
         I2CIP_DEBUG_SERIAL.print(F(": "));
         I2CIP_DEBUG_SERIAL.print(tval & 1 ? F("HIGH") : F("LOW"));
       }
-      tval >> 1;
-      cmask << 1;
+      tval >>= 1;
+      cmask <<= 1;
     }
     I2CIP_DEBUG_SERIAL.println('}');
     DEBUG_DELAY();
@@ -207,23 +207,23 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
   // errlev = getIODIR(iodir); // Uncomment to verify
   // I2CIP_ERR_BREAK(errlev);
 
-  #ifdef I2CIP_MCP23017_USEPULLUPS
-    // GPPU (100kOhm): 1 = input-pullup, 0 = none
+  // #ifdef I2CIP_MCP23017_USEPULLUPS
+  //   // GPPU (100kOhm): 1 = input-pullup, 0 = none
 
-    // Identical to IODIR (All inputs are pulled up)
-    errlev = writeRegister(MCP23XXX_GPPU, (uint8_t)(iodir & 0xFF) & (args & 0xFF), false);
-    I2CIP_ERR_BREAK(errlev);
-    errlev = writeRegister((uint8_t)(MCP23XXX_GPPU + I2CIP_MCP23017_BANKJUMP), (uint8_t)((iodir >> 8) & 0xFF) & (args >> 8), false);
-    I2CIP_ERR_BREAK(errlev);
+  //   // Identical to IODIR (All inputs are pulled up)
+  //   errlev = writeRegister(MCP23XXX_GPPU, (uint8_t)(iodir & 0xFF) & (args & 0xFF), false);
+  //   I2CIP_ERR_BREAK(errlev);
+  //   errlev = writeRegister((uint8_t)(MCP23XXX_GPPU + I2CIP_MCP23017_BANKJUMP), (uint8_t)((iodir >> 8) & 0xFF) & (args >> 8), false);
+  //   I2CIP_ERR_BREAK(errlev);
 
-  #else
-    // ALL OFF
-    errlev = writeRegister(MCP23XXX_GPPU, (uint8_t)0x00, false);
-    I2CIP_ERR_BREAK(errlev);
-    errlev = writeRegister((uint8_t)(MCP23XXX_GPPU + I2CIP_MCP23017_BANKJUMP), (uint8_t)0x00, false);
-    I2CIP_ERR_BREAK(errlev);
+  // #else
+  //   // ALL OFF
+  //   errlev = writeRegister(MCP23XXX_GPPU, (uint8_t)0x00, false);
+  //   I2CIP_ERR_BREAK(errlev);
+  //   errlev = writeRegister((uint8_t)(MCP23XXX_GPPU + I2CIP_MCP23017_BANKJUMP), (uint8_t)0x00, false);
+  //   I2CIP_ERR_BREAK(errlev);
 
-  #endif
+  // #endif
 
   // GPIO: 1 = high, 0 = low
 
@@ -238,8 +238,20 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
   I2CIP_ERR_BREAK(errlev);
 
   i2cip_mcp23017_t gpio = ((uint16_t)gpiob << 8) | gpioa;
-  i2cip_mcp23017_t send = (gpio & ~args); // Set selected to zeroes, leave everything else
-  send |= (value & args); // Set selected to value (arg-selected), leave everything else
+  i2cip_mcp23017_t send = (gpio & ~args) | (value & args);
+
+  #ifdef I2CIP_DEBUG_SERIAL
+    DEBUG_DELAY();
+    I2CIP_DEBUG_SERIAL.print(F("MCP23017 SET: OLD 0b"));
+    I2CIP_DEBUG_SERIAL.print((uint8_t)(gpio >> 8), BIN);
+    I2CIP_DEBUG_SERIAL.print(' ');
+    I2CIP_DEBUG_SERIAL.print((uint8_t)gpio, BIN);
+    I2CIP_DEBUG_SERIAL.print("; NEW 0b");
+    I2CIP_DEBUG_SERIAL.print((uint8_t)(send >> 8), BIN);
+    I2CIP_DEBUG_SERIAL.print(' ');
+    I2CIP_DEBUG_SERIAL.println((uint8_t)send, BIN);
+    DEBUG_DELAY();
+  #endif
 
   // Write GPIO
   errlev = writeRegister(MCP23XXX_GPIO, (uint8_t)(send & 0xFF), false);
