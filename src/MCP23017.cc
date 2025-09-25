@@ -227,14 +227,20 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
 
   // GPIO: 1 = high, 0 = low
 
+  #ifdef MCP23XXX_USE_OLAT
+  uint8_t reg = MCP23XXX_OLAT;
+  #else
+  uint8_t reg = MCP23XXX_GPIO;
+  #endif
+
   // Read GPIO LSB Bank A
   uint8_t gpioa = 0; // Low
-  errlev = readRegisterByte(MCP23XXX_GPIO, gpioa, false, false);
+  errlev = readRegisterByte(reg, gpioa, false, false);
   I2CIP_ERR_BREAK(errlev);
 
   // Read GPIO MSB Bank B
   uint8_t gpiob = 0;
-  errlev = readRegisterByte((uint8_t)(MCP23XXX_GPIO + I2CIP_MCP23017_BANKJUMP), gpiob, false, false);
+  errlev = readRegisterByte((uint8_t)(reg + I2CIP_MCP23017_BANKJUMP), gpiob, false, false);
   I2CIP_ERR_BREAK(errlev);
 
   i2cip_mcp23017_t gpio = ((uint16_t)gpiob << 8) | gpioa;
@@ -254,9 +260,9 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
   #endif
 
   // Write GPIO
-  errlev = writeRegister(MCP23XXX_GPIO, (uint8_t)(send & 0xFF), false);
+  errlev = writeRegister(reg, (uint8_t)(send & 0xFF), false);
   I2CIP_ERR_BREAK(errlev);
-  errlev = writeRegister((uint8_t)(MCP23XXX_GPIO + I2CIP_MCP23017_BANKJUMP), (uint8_t)((send >> 8) & 0xFF), false);
+  errlev = writeRegister((uint8_t)(reg + I2CIP_MCP23017_BANKJUMP), (uint8_t)((send >> 8) & 0xFF), false);
 
   return errlev;
 }

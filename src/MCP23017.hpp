@@ -5,7 +5,11 @@
 
 #include <I2CIP.h>
 
+// #define MCP23XXX_BANK 1 // Uncomment if IOCON.BANK = 1
+#define MCP23XXX_USE_OLAT 1 // Uncomment to use OLAT instead of GPIO for output
+
 // Registers
+#ifdef MCP23XXX_BANK
 #define MCP23XXX_IODIR    (uint8_t)0x00   //!< I/O direction register
 #define MCP23XXX_IPOL     (uint8_t)0x01    //!< Input polarity register
 #define MCP23XXX_GPINTEN  (uint8_t)0x02 //!< Interrupt-on-change control register
@@ -17,10 +21,24 @@
 #define MCP23XXX_INTCAP   (uint8_t)0x08 //!< Interrupt capture register
 #define MCP23XXX_GPIO     (uint8_t)0x09   //!< Port register
 #define MCP23XXX_OLAT     (uint8_t)0x0A   //!< Output latch register
+#define I2CIP_MCP23017_BANKJUMP     (uint8_t)0xA
+#else
+#define MCP23XXX_IODIR    (uint8_t)0x00   //!< I/O direction register
+#define MCP23XXX_IPOL     (uint8_t)0x02    //!< Input polarity register
+#define MCP23XXX_GPINTEN  (uint8_t)0x04 //!< Interrupt-on-change control register
+#define MCP23XXX_DEFVAL   (uint8_t)0x06 //!< Default compare register for interrupt-on-change
+#define MCP23XXX_INTCON   (uint8_t)0x08 //!< Interrupt control register
+#define MCP23XXX_IOCON    (uint8_t)0x0A  //!< Configuration register
+#define MCP23XXX_GPPU     (uint8_t)0x0C   //!< Pull-up resistor configuration register
+#define MCP23XXX_INTF     (uint8_t)0x0E   //!< Interrupt flag register
+#define MCP23XXX_INTCAP   (uint8_t)0x10 //!< Interrupt capture register
+#define MCP23XXX_GPIO     (uint8_t)0x12   //!< Port register
+#define MCP23XXX_OLAT     (uint8_t)0x14   //!< Output latch register
+#define I2CIP_MCP23017_BANKJUMP     (uint8_t)0x1
+#endif
 
 // #define I2CIP_MCP23017_SIZE     100   // MCP23017 size in bytes
 #define I2CIP_MCP23017_ADDRESS     32    // MCP23017 address (0x20-0x27)
-#define I2CIP_MCP23017_BANKJUMP     (uint8_t)0xA
 // #define I2CIP_MCP23017_TIMEOUT  1000   // If we're going to crash on a module ping fail, we should wait a bit
 
 // #define I2CIP_MCP23017_ID       "MCP23017"
