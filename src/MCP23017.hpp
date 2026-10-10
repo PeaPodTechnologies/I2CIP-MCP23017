@@ -9,6 +9,8 @@
 #define MCP23XXX_USE_OLAT 1 // Uncomment to use OLAT instead of GPIO for output
 
 // Registers
+#ifndef MCP23XXX_REGISTERS
+#define MCP23XXX_REGISTERS 1
 #ifdef MCP23XXX_BANK
 #define MCP23XXX_IODIR    (uint8_t)0x00   //!< I/O direction register
 #define MCP23XXX_IPOL     (uint8_t)0x01    //!< Input polarity register
@@ -35,6 +37,7 @@
 #define MCP23XXX_GPIO     (uint8_t)0x12   //!< Port register
 #define MCP23XXX_OLAT     (uint8_t)0x14   //!< Output latch register
 #define I2CIP_MCP23017_BANKJUMP     (uint8_t)0x1
+#endif
 #endif
 
 // #define I2CIP_MCP23017_SIZE     100   // MCP23017 size in bytes
