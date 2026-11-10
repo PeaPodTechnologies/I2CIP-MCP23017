@@ -227,7 +227,7 @@ i2cip_errorlevel_t MCP23017::set(const i2cip_mcp23017_t& value, const i2cip_mcp2
 
   // GPIO: 1 = high, 0 = low
 
-  #ifdef MCP23XXX_USE_OLAT
+  #ifdef MCP23018_USE_OLAT
   uint8_t reg = MCP23XXX_OLAT;
   #else
   uint8_t reg = MCP23XXX_GPIO;

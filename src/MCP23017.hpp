@@ -5,13 +5,13 @@
 
 #include <I2CIP.h>
 
-// #define MCP23XXX_BANK 1 // Uncomment if IOCON.BANK = 1
-#define MCP23XXX_USE_OLAT 1 // Uncomment to use OLAT instead of GPIO for output
+// #define MCP23018_BANK 1 // Uncomment if IOCON.BANK = 1
+#define MCP23018_USE_OLAT 1 // Uncomment to use OLAT instead of GPIO for output
 
 // Registers
 #ifndef MCP23XXX_REGISTERS
 #define MCP23XXX_REGISTERS 1
-#ifdef MCP23XXX_BANK
+#ifdef MCP23018_BANK
 #define MCP23XXX_IODIR    (uint8_t)0x00   //!< I/O direction register
 #define MCP23XXX_IPOL     (uint8_t)0x01    //!< Input polarity register
 #define MCP23XXX_GPINTEN  (uint8_t)0x02 //!< Interrupt-on-change control register
@@ -41,7 +41,7 @@
 #endif
 
 // #define I2CIP_MCP23017_SIZE     100   // MCP23017 size in bytes
-#define I2CIP_MCP23017_ADDRESS     32    // MCP23017 address (0x20-0x27)
+#define I2CIP_MCP23XXX_ADDRESS     32    // MCP23017 address (0x20-0x27)
 // #define I2CIP_MCP23017_TIMEOUT  1000   // If we're going to crash on a module ping fail, we should wait a bit
 
 // #define I2CIP_MCP23017_ID       "MCP23017"
@@ -107,8 +107,8 @@ class MCP23017 : public Device, public IOInterface<i2cip_mcp23017_t, i2cip_mcp23
     // friend class MCP23017_Pin;
 
   // protected:
-    i2cip_errorlevel_t getIODIR(i2cip_mcp23017_t& dest);
-    i2cip_errorlevel_t setIODIR(const i2cip_mcp23017_t& value);
+  i2cip_errorlevel_t getIODIR(i2cip_mcp23017_t& dest);
+  i2cip_errorlevel_t setIODIR(const i2cip_mcp23017_t& value);
 
     // i2cip_errorlevel_t getGPPU(i2cip_mcp23017_t& dest);
     // i2cip_errorlevel_t setGPPU(const i2cip_mcp23017_t& value);
